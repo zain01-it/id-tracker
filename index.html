@@ -41,6 +41,7 @@ details summary{font-weight:700;cursor:pointer;padding:3px 0}details .row{margin
 .fit-buttons{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;width:100%}
 .fit-buttons button.selected{background:#155eef;color:white;border-color:#155eef}
 .status{font-size:13px;color:#475467;min-height:20px;margin:10px 2px}
+.report-button{background:#067647;color:white}
 @media(max-width:390px){body{padding:12px}.value{font-size:22px}.card{padding:13px}.batchactions button{padding:9px 7px}}
 </style>
 </head>
@@ -52,12 +53,10 @@ details summary{font-weight:700;cursor:pointer;padding:3px 0}details .row{margin
  <div class="sub">Printing · Lamination · Xerox · Sales · Profit</div>
 </header>
 
-<!-- DASHBOARD SHOW/HIDE BUTTON -->
 <button type="button" class="dashboard-toggle" id="toggleDashboard" aria-expanded="false" aria-controls="dashboardCards">
  SHOW DASHBOARD ▼
 </button>
 
-<!-- ONLY DASHBOARD CARDS ARE COLLAPSIBLE -->
 <div id="dashboardCards" hidden>
 
 <div class="grid">
@@ -77,7 +76,6 @@ details summary{font-weight:700;cursor:pointer;padding:3px 0}details .row{margin
 </section>
 
 </div>
-<!-- END OF COLLAPSIBLE DASHBOARD -->
 
 <section class="card">
  <h2>Record completed IDs</h2>
@@ -161,6 +159,7 @@ details summary{font-weight:700;cursor:pointer;padding:3px 0}details .row{margin
 
 <div class="actions">
  <button class="secondary" id="undo">↶ Undo last batch</button>
+ <button class="report-button" id="saveReport">SAVE REPORT (PDF)</button>
  <button class="secondary" id="reset">Reset records</button>
 </div>
 
@@ -170,7 +169,6 @@ details summary{font-weight:700;cursor:pointer;padding:3px 0}details .row{margin
 (()=> {
  const $=id=>document.getElementById(id), KEY='simple-id-tracker-v1';
 
- // DASHBOARD COLLAPSE FUNCTION
  const dashboardCards=$('dashboardCards');
  const toggleDashboard=$('toggleDashboard');
 
@@ -190,7 +188,6 @@ details summary{font-weight:700;cursor:pointer;padding:3px 0}details .row{margin
   state=saved&&saved.cfg&&Array.isArray(saved.batches)?saved:clone(defaults);
  } catch(e){state=clone(defaults);}
 
- // Safe migration: preserve existing batches and add the Xerox state fields.
  state.cfg={...defaults.cfg,...(state.cfg||{})};
  state.xeroxJobs=Array.isArray(state.xeroxJobs)?state.xeroxJobs:[];
  state.xeroxJobs=state.xeroxJobs.map(j=>({paper:Math.max(1,Math.floor(Number(j.paper)||1)),income:Number.isFinite(Number(j.income))?Number(j.income):Math.max(1,Math.floor(Number(j.paper)||1))*5,createdAt:j.createdAt||Date.now()}));
@@ -257,6 +254,135 @@ details summary{font-weight:700;cursor:pointer;padding:3px 0}details .row{margin
 
  function fillSettings(){['lamStock','paperStock','rate','lamCost'].forEach(k=>{const el=$(k);if(el)el.value=state.cfg[k]??defaults.cfg[k];});}
 
+ // CREATE A PRINTABLE REPORT THAT CAN BE SAVED AS PDF
+ function escapeHTML(value){
+  return String(value??'').replace(/[&<>"']/g,ch=>({
+   '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+  })[ch]);
+ }
+
+ function dateText(value){
+  const d=new Date(value);
+  return Number.isNaN(d.getTime())?'—':d.toLocaleString('en-PH');
+ }
+
+ function saveReport(){
+  const t=totals();
+  const xeroxPaper=state.xeroxJobs.reduce((s,j)=>s+j.paper,0);
+  const totalPaper=t.paper+xeroxPaper;
+  const remainingPaper=Math.max(0,state.cfg.paperStock-totalPaper);
+  const remainingLam=Math.max(0,state.cfg.lamStock-t.lam);
+  const generated=new Date();
+
+  const batchRows=state.batches.map((b,i)=>`
+   <tr>
+    <td>${i+1}</td>
+    <td>${escapeHTML(dateText(b.createdAt))}</td>
+    <td>${b.qty}</td>
+    <td>${b.fit}</td>
+    <td>${b.paper}</td>
+    <td>${money(b.qty*b.rate)}</td>
+    <td>${b.xeroxCompleted?money(b.paper*(b.xeroxRate??5)):'—'}</td>
+   </tr>
+  `).join('');
+
+  const xeroxRows=state.xeroxJobs.map((j,i)=>`
+   <tr>
+    <td>${i+1}</td>
+    <td>${escapeHTML(dateText(j.createdAt))}</td>
+    <td>${j.paper}</td>
+    <td>${money(j.income)}</td>
+   </tr>
+  `).join('');
+
+  const win=window.open('','_blank');
+  if(!win){
+   $('status').textContent='Report window was blocked. Allow pop-ups for this site, then try again.';
+   return;
+  }
+
+  win.document.open();
+  win.document.write(`<!doctype html>
+  <html lang="en">
+  <head>
+   <meta charset="utf-8">
+   <meta name="viewport" content="width=device-width,initial-scale=1">
+   <title>ID Printing Business Report</title>
+   <style>
+    body{font-family:Arial,sans-serif;color:#182230;margin:28px;font-size:12px}
+    h1{font-size:23px;margin:0 0 5px}
+    h2{font-size:16px;margin:25px 0 10px}
+    .muted{color:#667085;font-size:11px}
+    .summary{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:18px}
+    .box{border:1px solid #ddd;border-radius:7px;padding:10px}
+    .label{font-size:10px;color:#667085;font-weight:bold}
+    .value{font-size:17px;font-weight:bold;margin-top:4px}
+    .profit{color:#067647}
+    table{width:100%;border-collapse:collapse;margin-top:8px}
+    th,td{border:1px solid #ddd;padding:7px;text-align:left;vertical-align:top}
+    th{background:#f2f4f7}
+    .note{margin-top:25px;color:#667085;font-size:10px}
+    @media print{
+     body{margin:12mm}
+     button{display:none}
+     .box{break-inside:avoid}
+     table{page-break-inside:auto}
+     tr{page-break-inside:avoid;page-break-after:auto}
+    }
+   </style>
+  </head>
+  <body>
+   <h1>ID Printing & Lamination Tracker</h1>
+   <div class="muted">Business report · Generated ${escapeHTML(generated.toLocaleString('en-PH'))}</div>
+
+   <h2>Financial Summary</h2>
+   <div class="summary">
+    <div class="box"><div class="label">TOTAL IDs PRINTED</div><div class="value">${t.ids}</div></div>
+    <div class="box"><div class="label">XEROX JOBS COMPLETED</div><div class="value">${t.xeroxJobs}</div></div>
+    <div class="box"><div class="label">ID PRINTING INCOME</div><div class="value">${money(t.idIncome)}</div></div>
+    <div class="box"><div class="label">XEROX INCOME</div><div class="value">${money(t.xeroxIncome)}</div></div>
+    <div class="box"><div class="label">TOTAL INCOME</div><div class="value">${money(t.gross)}</div></div>
+    <div class="box"><div class="label">LAMINATION EXPENSES</div><div class="value">${money(t.expense)}</div></div>
+    <div class="box"><div class="label">NET PROFIT</div><div class="value profit">${money(t.profit)}</div></div>
+   </div>
+
+   <h2>Supply Summary</h2>
+   <table>
+    <thead><tr><th>Supply</th><th>Starting Stock</th><th>Used</th><th>Remaining</th></tr></thead>
+    <tbody>
+     <tr><td>Paper sheets</td><td>${state.cfg.paperStock}</td><td>${totalPaper}</td><td>${remainingPaper}</td></tr>
+     <tr><td>Lamination sheets</td><td>${state.cfg.lamStock}</td><td>${t.lam}</td><td>${remainingLam}</td></tr>
+    </tbody>
+   </table>
+
+   <h2>ID Printing Batches</h2>
+   <table>
+    <thead><tr><th>#</th><th>Date</th><th>IDs</th><th>IDs per sheet</th><th>Paper sheets</th><th>ID income</th><th>Legacy Xerox credit</th></tr></thead>
+    <tbody>${batchRows||'<tr><td colspan="7">No ID batches recorded.</td></tr>'}</tbody>
+   </table>
+
+   <h2>Separate Xerox Entries</h2>
+   <table>
+    <thead><tr><th>#</th><th>Date</th><th>Paper sheets</th><th>Xerox income</th></tr></thead>
+    <tbody>${xeroxRows||'<tr><td colspan="4">No separate Xerox entries recorded.</td></tr>'}</tbody>
+   </table>
+
+   <div class="note">
+    Paper stock is tracked by quantity only and is not included as a peso expense.
+    Net profit is calculated as total ID and Xerox income minus lamination expenses.
+   </div>
+
+   <script>
+    window.onload=function(){setTimeout(function(){window.print()},500)};
+   <\/script>
+  </body>
+  </html>`);
+  win.document.close();
+  $('status').textContent='Report opened. Choose Save as PDF in the print options.';
+ }
+
+ $('saveReport').addEventListener('click',saveReport);
+
  document.querySelectorAll('.numpad').forEach(pad=>pad.addEventListener('click',e=>{
   const btn=e.target.closest('button');if(!btn)return;
   const target=$(pad.dataset.target);let value=target.value||'';
@@ -276,7 +402,7 @@ details summary{font-weight:700;cursor:pointer;padding:3px 0}details .row{margin
  $('add').addEventListener('click',()=>{
   const q=val('qty'),fit=val('fit'),paper=1,t=totals();
   if(!Number.isInteger(q)||q<1||!Number.isInteger(fit)||fit<1||fit>6||t.lam+q>state.cfg.lamStock||t.paper+paper>state.cfg.paperStock)return;
-  state.batches.push({qty:q,fit,paper,rate:state.cfg.rate,xeroxCompleted:false,xeroxRate:5,xeroxCost:state.cfg.xeroxCost});
+  state.batches.push({qty:q,fit,paper,rate:state.cfg.rate,xeroxCompleted:false,xeroxRate:5,xeroxCost:state.cfg.xeroxCost,createdAt:Date.now()});
   save();$('qty').value=6;$('status').textContent='Batch recorded. One paper sheet and the required lamination sheets were deducted.';render();
  });
 
@@ -284,7 +410,7 @@ details summary{font-weight:700;cursor:pointer;padding:3px 0}details .row{margin
   const button=e.target.closest('[data-undo-xerox]');if(!button)return;
   const i=Number(button.dataset.undoXerox);if(!Number.isInteger(i)||!state.xeroxJobs[i])return;
   state.xeroxJobs.splice(i,1);save();
-  $('status').textContent='Xerox entry undone. Its income, paper usage, and related expenses were reversed.';
+  $('status').textContent='Xerox entry undone. Its income and paper usage were reversed.';
   render();
  });
 
@@ -307,7 +433,8 @@ details summary{font-weight:700;cursor:pointer;padding:3px 0}details .row{margin
    next[k]=x;
   }
   const t=totals();
-  if(next.lamStock<t.lam||next.paperStock<t.paper){$('status').textContent='Starting stock cannot be less than supplies already used.';return;}
+  const xeroxPaper=state.xeroxJobs.reduce((s,j)=>s+j.paper,0);
+  if(next.lamStock<t.lam||next.paperStock<t.paper+xeroxPaper){$('status').textContent='Starting stock cannot be less than supplies already used.';return;}
   state.cfg=next;save();
   const stored=JSON.parse(localStorage.getItem(KEY)||'null');
   $('status').textContent=stored&&stored.cfg&&stored.cfg.lamStock===next.lamStock&&stored.cfg.paperStock===next.paperStock?'Settings saved on this device.':'Could not verify saved settings. Check browser storage permissions.';
@@ -319,8 +446,12 @@ details summary{font-weight:700;cursor:pointer;padding:3px 0}details .row{margin
  });
 
  $('reset').addEventListener('click',()=>{
-  if(confirm('Clear all batches and start the count again? Stock and price settings will remain.')){
-   state.batches=[];save();$('status').textContent='Batch records cleared.';render();
+  if(confirm('Clear ALL ID batches and Xerox records? Your stock and price settings will remain. Make sure you have saved your PDF report first.')){
+   state.batches=[];
+   state.xeroxJobs=[];
+   save();
+   $('status').textContent='All ID and Xerox records cleared. Your settings were kept.';
+   render();
   }
  });
 
