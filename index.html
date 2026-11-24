@@ -9,7 +9,9 @@
 :root{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:#182230;background:#f4f6fa}
 *{box-sizing:border-box}body{margin:0;padding:18px;max-width:760px;margin-inline:auto}
 header{margin:8px 0 18px}h1{font-size:24px;margin:0 0 4px}.sub,.muted{color:#667085;font-size:13px}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.card{background:white;border:1px solid #e4e7ec;border-radius:15px;padding:15px;margin-bottom:12px;min-width:0}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+ .card{background:white;border:1px solid #e4e7ec;border-radius:15px;padding:15px;margin-bottom:12px;min-width:0}
+  .card-full{background:white;border:1px solid #e4e7ec;border-radius:15px;padding:15px;margin-bottom:12px;width:100%}
 .label{font-size:12px;color:#667085;font-weight:650;letter-spacing:.2px}.value{font-size:25px;font-weight:750;letter-spacing:-.7px;margin-top:3px;overflow-wrap:anywhere}
 h2{font-size:16px;margin:0 0 12px}.row{display:grid;grid-template-columns:1fr;gap:14px}
 label{display:block;font-size:13px;color:#475467;margin-bottom:5px}
@@ -40,11 +42,7 @@ details summary{font-weight:700;cursor:pointer;padding:3px 0}details .row{margin
  <section class="card"><div class="label">XEROX INCOME</div><div class="value" id="xeroxIncome">₱0.00</div></section>
  <section class="card"><div class="label">TOTAL INCOME</div><div class="value" id="gross">₱0.00</div></section>
  <section class="card"><div class="label">LAMINATION EXPENSES</div><div class="value" id="expense">₱0.00</div></section>
-</div>
-<div class="grid" style="width=100%">
  <section class="card-full"><div class="label">NET PROFIT</div><div class="value green" id="profit">₱0.00</div></section>
-</div>
- <div class="grid">
  <section class="card"><div class="label">REMAINING PAPER STOCK</div><div class="value" id="paperLeft">100</div><div class="muted" id="paperUsed">0 used</div></section>
  <section class="card"><div class="label">REMAINING LAMINATION STOCK</div><div class="value" id="lamLeft">100</div><div class="muted" id="lamUsed">0 used</div></section>
 </div>
