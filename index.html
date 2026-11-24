@@ -7,62 +7,41 @@
 <title>ID Printing & Lamination Tracker</title>
 <style>
 :root{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:#182230;background:#f4f6fa}
-*{box-sizing:border-box}
-body{margin:0;padding:18px;max-width:760px;margin-inline:auto}
-header{margin:8px 0 18px}
-h1{font-size:24px;margin:0 0 4px}
-.sub,.muted{color:#667085;font-size:13px}
+*{box-sizing:border-box}body{margin:0;padding:18px;max-width:760px;margin-inline:auto}
+header{margin:8px 0 18px}h1{font-size:24px;margin:0 0 4px}.sub,.muted{color:#667085;font-size:13px}
 
-.tracker-toggle{
+.dashboard-toggle{
  width:100%;
- min-height:52px;
- margin:0 0 16px;
+ min-height:48px;
+ margin-bottom:12px;
  background:#155eef;
  color:white;
- font-size:15px;
- border-radius:12px;
  font-weight:750;
+ font-size:15px;
 }
-#trackerContent[hidden]{display:none}
+#dashboardCards[hidden]{display:none}
 
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .card{background:white;border:1px solid #e4e7ec;border-radius:15px;padding:15px;margin-bottom:12px;min-width:0}
 .card-full{background:white;border:1px solid #e4e7ec;border-radius:15px;padding:15px;margin-bottom:12px;min-width:100%}
-.label{font-size:12px;color:#667085;font-weight:650;letter-spacing:.2px}
-.value{font-size:25px;font-weight:750;letter-spacing:-.7px;margin-top:3px;overflow-wrap:anywhere}
-h2{font-size:16px;margin:0 0 12px}
-.row{display:grid;grid-template-columns:1fr;gap:14px}
+.label{font-size:12px;color:#667085;font-weight:650;letter-spacing:.2px}.value{font-size:25px;font-weight:750;letter-spacing:-.7px;margin-top:3px;overflow-wrap:anywhere}
+h2{font-size:16px;margin:0 0 12px}.row{display:grid;grid-template-columns:1fr;gap:14px}
 label{display:block;font-size:13px;color:#475467;margin-bottom:5px}
 input,select{width:100%;min-height:48px;border:1px solid #d0d5dd;border-radius:10px;padding:10px;font-size:16px;background:white;color:#182230}
 button{border:0;border-radius:11px;min-height:48px;padding:11px 14px;font-size:14px;font-weight:750;cursor:pointer}
-button:disabled{opacity:.45;cursor:not-allowed}
-.primary{background:#155eef;color:white;width:100%;font-size:17px}
-.secondary{background:white;border:1px solid #d0d5dd;color:#344054;width:100%}
-.actions{display:grid;grid-template-columns:1fr 1fr;gap:9px}
-.green{color:#067647}
-.notice{font-size:13px;color:#475467;margin:9px 0 0;line-height:1.45}
-.stocknum{font-size:25px;font-weight:750}
-.batch{padding:13px 0;border-top:1px solid #eaecf0;font-size:13px}
-.batchtop{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
-.batchmeta{color:#667085;line-height:1.55;margin-top:4px}
-.batchactions{display:flex;gap:8px;margin-top:10px}
-.batchactions button{flex:1;min-height:42px;font-size:12px}
-.xerox-done{background:#ecfdf3;color:#067647;border:1px solid #abefc6}
-.xerox-pending{background:#155eef;color:white}
-details summary{font-weight:700;cursor:pointer;padding:3px 0}
-details .row{margin-top:12px}
+button:disabled{opacity:.45;cursor:not-allowed}.primary{background:#155eef;color:white;width:100%;font-size:17px}.secondary{background:white;border:1px solid #d0d5dd;color:#344054;width:100%}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:9px}.green{color:#067647}.notice{font-size:13px;color:#475467;margin:9px 0 0;line-height:1.45}
+.stocknum{font-size:25px;font-weight:750}.batch{padding:13px 0;border-top:1px solid #eaecf0;font-size:13px}
+.batchtop{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}.batchmeta{color:#667085;line-height:1.55;margin-top:4px}
+.batchactions{display:flex;gap:8px;margin-top:10px}.batchactions button{flex:1;min-height:42px;font-size:12px}
+.xerox-done{background:#ecfdf3;color:#067647;border:1px solid #abefc6}.xerox-pending{background:#155eef;color:white}
+details summary{font-weight:700;cursor:pointer;padding:3px 0}details .row{margin-top:12px}
 .numpad{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px;width:100%}
 .numpad button,.fit-buttons button{min-height:52px;background:#f2f4f7;border:1px solid #d0d5dd;color:#344054;font-size:19px;padding:9px}
 .fit-buttons{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;width:100%}
 .fit-buttons button.selected{background:#155eef;color:white;border-color:#155eef}
 .status{font-size:13px;color:#475467;min-height:20px;margin:10px 2px}
-
-@media(max-width:390px){
- body{padding:12px}
- .value{font-size:22px}
- .card{padding:13px}
- .batchactions button{padding:9px 7px}
-}
+@media(max-width:390px){body{padding:12px}.value{font-size:22px}.card{padding:13px}.batchactions button{padding:9px 7px}}
 </style>
 </head>
 
@@ -73,54 +52,23 @@ details .row{margin-top:12px}
  <div class="sub">Printing · Lamination · Xerox · Sales · Profit</div>
 </header>
 
-<button type="button" class="tracker-toggle" id="toggleTracker" aria-expanded="false" aria-controls="trackerContent">
- SHOW TRACKER CONTENT ▼
+<!-- DASHBOARD SHOW/HIDE BUTTON -->
+<button type="button" class="dashboard-toggle" id="toggleDashboard" aria-expanded="false" aria-controls="dashboardCards">
+ SHOW DASHBOARD ▼
 </button>
 
-<main id="trackerContent" hidden>
+<!-- ONLY DASHBOARD CARDS ARE COLLAPSIBLE -->
+<div id="dashboardCards" hidden>
 
 <div class="grid">
- <section class="card">
-  <div class="label">REMAINING PAPER STOCK</div>
-  <div class="value" id="paperLeft">100</div>
-  <div class="muted" id="paperUsed">0 used</div>
- </section>
-
- <section class="card">
-  <div class="label">REMAINING LAMINATION STOCK</div>
-  <div class="value" id="lamLeft">100</div>
-  <div class="muted" id="lamUsed">0 used</div>
- </section>
-
- <section class="card">
-  <div class="label">TOTAL IDs PRINTED</div>
-  <div class="value" id="ids">0</div>
- </section>
-
- <section class="card">
-  <div class="label">ID PRINTING INCOME</div>
-  <div class="value" id="idIncome">₱0.00</div>
- </section>
-
- <section class="card">
-  <div class="label">XEROX JOBS COMPLETED</div>
-  <div class="value" id="xeroxJobs">0</div>
- </section>
-
- <section class="card">
-  <div class="label">XEROX INCOME</div>
-  <div class="value" id="xeroxIncome">₱0.00</div>
- </section>
-
- <section class="card">
-  <div class="label">TOTAL INCOME</div>
-  <div class="value" id="gross">₱0.00</div>
- </section>
-
- <section class="card">
-  <div class="label">LAMINATION EXPENSES</div>
-  <div class="value" id="expense">₱0.00</div>
- </section>
+ <section class="card"><div class="label">REMAINING PAPER STOCK</div><div class="value" id="paperLeft">100</div><div class="muted" id="paperUsed">0 used</div></section>
+ <section class="card"><div class="label">REMAINING LAMINATION STOCK</div><div class="value" id="lamLeft">100</div><div class="muted" id="lamUsed">0 used</div></section>
+ <section class="card"><div class="label">TOTAL IDs PRINTED</div><div class="value" id="ids">0</div></section>
+ <section class="card"><div class="label">ID PRINTING INCOME</div><div class="value" id="idIncome">₱0.00</div></section>
+ <section class="card"><div class="label">XEROX JOBS COMPLETED</div><div class="value" id="xeroxJobs">0</div></section>
+ <section class="card"><div class="label">XEROX INCOME</div><div class="value" id="xeroxIncome">₱0.00</div></section>
+ <section class="card"><div class="label">TOTAL INCOME</div><div class="value" id="gross">₱0.00</div></section>
+ <section class="card"><div class="label">LAMINATION EXPENSES</div><div class="value" id="expense">₱0.00</div></section>
 </div>
 
 <section class="card-full">
@@ -128,42 +76,29 @@ details .row{margin-top:12px}
  <div class="value green" id="profit">₱0.00</div>
 </section>
 
+</div>
+<!-- END OF COLLAPSIBLE DASHBOARD -->
+
 <section class="card">
  <h2>Record completed IDs</h2>
-
  <div>
   <label>Number of IDs</label>
   <input id="qty" type="text" inputmode="none" value="6" readonly>
-
   <div class="numpad" data-target="qty">
-   <button type="button" data-digit="1">1</button>
-   <button type="button" data-digit="2">2</button>
-   <button type="button" data-digit="3">3</button>
-   <button type="button" data-digit="4">4</button>
-   <button type="button" data-digit="5">5</button>
-   <button type="button" data-digit="6">6</button>
-   <button type="button" data-digit="7">7</button>
-   <button type="button" data-digit="8">8</button>
-   <button type="button" data-digit="9">9</button>
-   <button type="button" data-action="clear">Clear</button>
-   <button type="button" data-digit="0">0</button>
-   <button type="button" data-action="back">⌫</button>
+   <button type="button" data-digit="1">1</button><button type="button" data-digit="2">2</button><button type="button" data-digit="3">3</button>
+   <button type="button" data-digit="4">4</button><button type="button" data-digit="5">5</button><button type="button" data-digit="6">6</button>
+   <button type="button" data-digit="7">7</button><button type="button" data-digit="8">8</button><button type="button" data-digit="9">9</button>
+   <button type="button" data-action="clear">Clear</button><button type="button" data-digit="0">0</button><button type="button" data-action="back">⌫</button>
   </div>
  </div>
 
  <div style="margin-top:16px">
   <label>IDs per paper sheet</label>
   <input id="fitDisplay" type="text" value="6" readonly aria-label="IDs per paper sheet">
-
   <div class="fit-buttons" id="fitButtons" style="margin-top:8px">
-   <button type="button" data-fit="1">1</button>
-   <button type="button" data-fit="2">2</button>
-   <button type="button" data-fit="3">3</button>
-   <button type="button" data-fit="4">4</button>
-   <button type="button" data-fit="5">5</button>
-   <button type="button" data-fit="6" class="selected">6</button>
+   <button type="button" data-fit="1">1</button><button type="button" data-fit="2">2</button><button type="button" data-fit="3">3</button>
+   <button type="button" data-fit="4">4</button><button type="button" data-fit="5">5</button><button type="button" data-fit="6" class="selected">6</button>
   </div>
-
   <input id="fit" type="hidden" value="6">
  </div>
 
@@ -173,28 +108,16 @@ details .row{margin-top:12px}
 
 <section class="card">
  <h2>Separate Xerox completion</h2>
-
- <p class="notice" style="margin-top:-4px">
-  Record Xerox paper usage independently from ID-printing batches. Enter the number of paper sheets actually Xeroxed, then finish the job.
- </p>
+ <p class="notice" style="margin-top:-4px">Record Xerox paper usage independently from ID-printing batches. Enter the number of paper sheets actually Xeroxed, then finish the job.</p>
 
  <div style="margin-top:12px">
   <label>Number of paper sheets for Xerox</label>
   <input id="xeroxPaperQty" type="text" inputmode="none" value="" readonly>
-
   <div class="numpad" data-target="xeroxPaperQty">
-   <button type="button" data-digit="1">1</button>
-   <button type="button" data-digit="2">2</button>
-   <button type="button" data-digit="3">3</button>
-   <button type="button" data-digit="4">4</button>
-   <button type="button" data-digit="5">5</button>
-   <button type="button" data-digit="6">6</button>
-   <button type="button" data-digit="7">7</button>
-   <button type="button" data-digit="8">8</button>
-   <button type="button" data-digit="9">9</button>
-   <button type="button" data-action="clear">Clear</button>
-   <button type="button" data-digit="0">0</button>
-   <button type="button" data-action="back">⌫</button>
+   <button type="button" data-digit="1">1</button><button type="button" data-digit="2">2</button><button type="button" data-digit="3">3</button>
+   <button type="button" data-digit="4">4</button><button type="button" data-digit="5">5</button><button type="button" data-digit="6">6</button>
+   <button type="button" data-digit="7">7</button><button type="button" data-digit="8">8</button><button type="button" data-digit="9">9</button>
+   <button type="button" data-action="clear">Clear</button><button type="button" data-digit="0">0</button><button type="button" data-action="back">⌫</button>
   </div>
  </div>
 
@@ -205,11 +128,7 @@ details .row{margin-top:12px}
  </div>
 
  <button class="primary" id="finishXerox" style="margin-top:12px">FINISH XEROX / DONE</button>
-
- <p class="notice">
-  When completed, income is added and the same number of paper sheets is deducted from remaining paper stock. Each entry is recorded once and can be undone below.
- </p>
-
+ <p class="notice">When completed, income is added and the same number of paper sheets is deducted from remaining paper stock. Each entry is recorded once and can be undone below.</p>
  <div id="xeroxHistory" style="margin-top:10px"></div>
 </section>
 
@@ -220,53 +139,23 @@ details .row{margin-top:12px}
 
 <section class="card">
  <h2>Remaining supplies</h2>
-
  <div class="grid">
-  <div>
-   <div class="label">Lamination sheets</div>
-   <div class="stocknum" id="lamLeftSmall">100</div>
-   <div class="muted" id="lamUsedSmall">0 used</div>
-  </div>
-
-  <div>
-   <div class="label">Paper sheets</div>
-   <div class="stocknum" id="paperLeftSmall">100</div>
-   <div class="muted" id="paperUsedSmall">0 used</div>
-  </div>
+  <div><div class="label">Lamination sheets</div><div class="stocknum" id="lamLeftSmall">100</div><div class="muted" id="lamUsedSmall">0 used</div></div>
+  <div><div class="label">Paper sheets</div><div class="stocknum" id="paperLeftSmall">100</div><div class="muted" id="paperUsedSmall">0 used</div></div>
  </div>
 </section>
 
 <section class="card">
  <details>
   <summary>⚙ Stock & price settings</summary>
-
   <div class="row">
-   <div>
-    <label for="lamStock">Starting lamination stock</label>
-    <input id="lamStock" type="number" min="0" value="100">
-   </div>
-
-   <div>
-    <label for="paperStock">Starting paper stock</label>
-    <input id="paperStock" type="number" min="0" value="100">
-   </div>
-
-   <div>
-    <label for="rate">Price per ID (₱)</label>
-    <input id="rate" type="number" min="0" step=".01" value="40">
-   </div>
-
-   <div>
-    <label for="lamCost">Cost per lamination (₱)</label>
-    <input id="lamCost" type="number" min="0" step=".01" value="0">
-   </div>
+   <div><label for="lamStock">Starting lamination stock</label><input id="lamStock" type="number" min="0" value="100"></div>
+   <div><label for="paperStock">Starting paper stock</label><input id="paperStock" type="number" min="0" value="100"></div>
+   <div><label for="rate">Price per ID (₱)</label><input id="rate" type="number" min="0" step=".01" value="40"></div>
+   <div><label for="lamCost">Cost per lamination (₱)</label><input id="lamCost" type="number" min="0" step=".01" value="0"></div>
   </div>
-
   <button class="secondary" id="saveSettings" style="margin-top:12px">SAVE SETTINGS</button>
-
-  <p class="notice">
-   Paper is quantity-only inventory because it is purchased in bundles, not at a fixed per-sheet price. Xerox adds ₱5 income per sheet entered in the separate Xerox section. Paper usage changes the remaining sheet count only; it does not create a peso expense.
-  </p>
+  <p class="notice">Paper is quantity-only inventory because it is purchased in bundles, not at a fixed per-sheet price. Xerox adds ₱5 income per sheet entered in the separate Xerox section. Paper usage changes the remaining sheet count only; it does not create a peso expense.</p>
  </details>
 </section>
 
@@ -275,25 +164,21 @@ details .row{margin-top:12px}
  <button class="secondary" id="reset">Reset records</button>
 </div>
 
-<div class="status" id="status" aria-live="polite">
- Your records are saved on this device/browser.
-</div>
-
-</main>
+<div class="status" id="status" aria-live="polite">Your records are saved on this device/browser.</div>
 
 <script>
 (()=> {
  const $=id=>document.getElementById(id), KEY='simple-id-tracker-v1';
 
- // SHOW / HIDE THE ENTIRE TRACKER
- const trackerContent=$('trackerContent');
- const toggleTracker=$('toggleTracker');
+ // DASHBOARD COLLAPSE FUNCTION
+ const dashboardCards=$('dashboardCards');
+ const toggleDashboard=$('toggleDashboard');
 
- toggleTracker.addEventListener('click',()=>{
-  const show=trackerContent.hidden;
-  trackerContent.hidden=!show;
-  toggleTracker.textContent=show?'HIDE TRACKER CONTENT ▲':'SHOW TRACKER CONTENT ▼';
-  toggleTracker.setAttribute('aria-expanded',String(show));
+ toggleDashboard.addEventListener('click',()=>{
+  const show=dashboardCards.hidden;
+  dashboardCards.hidden=!show;
+  toggleDashboard.textContent=show?'HIDE DASHBOARD ▲':'SHOW DASHBOARD ▼';
+  toggleDashboard.setAttribute('aria-expanded',String(show));
  });
 
  const defaults={cfg:{lamStock:100,paperStock:100,rate:40,lamCost:0,paperCost:0,xeroxCost:5},batches:[]};
@@ -308,11 +193,7 @@ details .row{margin-top:12px}
  // Safe migration: preserve existing batches and add the Xerox state fields.
  state.cfg={...defaults.cfg,...(state.cfg||{})};
  state.xeroxJobs=Array.isArray(state.xeroxJobs)?state.xeroxJobs:[];
- state.xeroxJobs=state.xeroxJobs.map(j=>({
-  paper:Math.max(1,Math.floor(Number(j.paper)||1)),
-  income:Number.isFinite(Number(j.income))?Number(j.income):Math.max(1,Math.floor(Number(j.paper)||1))*5,
-  createdAt:j.createdAt||Date.now()
- }));
+ state.xeroxJobs=state.xeroxJobs.map(j=>({paper:Math.max(1,Math.floor(Number(j.paper)||1)),income:Number.isFinite(Number(j.income))?Number(j.income):Math.max(1,Math.floor(Number(j.paper)||1))*5,createdAt:j.createdAt||Date.now()}));
 
  state.batches=state.batches.map(b=>({
   ...b,
@@ -327,21 +208,11 @@ details .row{margin-top:12px}
 
  const money=n=>'₱'+Number(n||0).toLocaleString('en-PH',{minimumFractionDigits:2,maximumFractionDigits:2});
  const val=id=>Number($(id).value);
-
- const save=()=>{
-  try{
-   localStorage.setItem(KEY,JSON.stringify(state));
-   return true;
-  }catch(e){
-   $('status').textContent='Could not save on this browser. Check available storage or private browsing settings.';
-   return false;
-  }
- };
+ const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(state));return true;}catch(e){$('status').textContent='Could not save on this browser. Check available storage or private browsing settings.';return false;}};
 
  function totals(){
   const ids=state.batches.reduce((s,b)=>s+b.qty,0);
-  const lam=ids;
-  const paper=state.batches.reduce((s,b)=>s+b.paper,0);
+  const lam=ids, paper=state.batches.reduce((s,b)=>s+b.paper,0);
   const idIncome=state.batches.reduce((s,b)=>s+b.qty*b.rate,0);
   const legacyCompleted=state.batches.filter(b=>b.xeroxCompleted);
   const xeroxJobs=legacyCompleted.length+state.xeroxJobs.length;
@@ -349,140 +220,70 @@ details .row{margin-top:12px}
   const xeroxPaper=state.xeroxJobs.reduce((s,j)=>s+j.paper,0);
   const expense=lam*state.cfg.lamCost;
   const gross=idIncome+xeroxIncome;
-
   return {ids,lam,paper,idIncome,xeroxJobs,xeroxIncome,gross,expense,profit:gross-expense};
  }
 
  function render(){
   const t=totals(),q=val('qty'),fit=val('fit'),paper=1;
-
-  $('ids').textContent=t.ids;
-  $('idIncome').textContent=money(t.idIncome);
-  $('xeroxJobs').textContent=t.xeroxJobs;
-  $('xeroxIncome').textContent=money(t.xeroxIncome);
-  $('gross').textContent=money(t.gross);
-  $('profit').textContent=money(t.profit);
-  $('expense').textContent=money(t.expense);
+  $('ids').textContent=t.ids;$('idIncome').textContent=money(t.idIncome);
+  $('xeroxJobs').textContent=t.xeroxJobs;$('xeroxIncome').textContent=money(t.xeroxIncome);
+  $('gross').textContent=money(t.gross);$('profit').textContent=money(t.profit);$('expense').textContent=money(t.expense);
 
   const xeroxPaperUsed=state.xeroxJobs.reduce((s,j)=>s+j.paper,0);
-  const leftLam=Math.max(0,state.cfg.lamStock-t.lam);
-  const leftPaper=Math.max(0,state.cfg.paperStock-t.paper-xeroxPaperUsed);
-
-  $('lamLeft').textContent=leftLam;
-  $('paperLeft').textContent=leftPaper;
-  $('lamLeftSmall').textContent=leftLam;
-  $('paperLeftSmall').textContent=leftPaper;
-
-  $('lamUsed').textContent=t.lam+' used';
-  $('paperUsed').textContent=(t.paper+xeroxPaperUsed)+' used (printing '+t.paper+' + Xerox '+xeroxPaperUsed+')';
-  $('lamUsedSmall').textContent=t.lam+' used';
-  $('paperUsedSmall').textContent=(t.paper+xeroxPaperUsed)+' used';
+  const leftLam=Math.max(0,state.cfg.lamStock-t.lam),leftPaper=Math.max(0,state.cfg.paperStock-t.paper-xeroxPaperUsed);
+  $('lamLeft').textContent=leftLam;$('paperLeft').textContent=leftPaper;
+  $('lamLeftSmall').textContent=leftLam;$('paperLeftSmall').textContent=leftPaper;
+  $('lamUsed').textContent=t.lam+' used';$('paperUsed').textContent=(t.paper+xeroxPaperUsed)+' used (printing '+t.paper+' + Xerox '+xeroxPaperUsed+')';
+  $('lamUsedSmall').textContent=t.lam+' used';$('paperUsedSmall').textContent=(t.paper+xeroxPaperUsed)+' used';
 
   $('preview').textContent=Number.isInteger(q)&&q>0&&Number.isInteger(fit)&&fit>=1&&fit<=6?`${q} IDs = ${q} lamination sheets + 1 paper sheet · ${money(q*state.cfg.rate)}`:'Enter a valid number of IDs.';
-
   $('add').disabled=!(Number.isInteger(q)&&q>0&&Number.isInteger(fit)&&fit>=1&&fit<=6&&t.lam+q<=state.cfg.lamStock&&t.paper+paper<=state.cfg.paperStock);
-
   $('undo').disabled=!state.batches.length;
 
   $('history').innerHTML=state.batches.length?state.batches.slice().reverse().slice(0,20).map(b=>{
    const done=b.xeroxCompleted;
    const xi=done?b.paper*(b.xeroxRate??5):0;
-
    return `<div class="batch">
-    <div class="batchtop">
-     <div>
-      <b>${b.qty} IDs</b> · ${b.fit} IDs per paper sheet
-      <div class="batchmeta">
-       ${b.paper} paper sheets · ${b.qty} lamination sheets<br>
-       ID printing income: ${money(b.qty*b.rate)}${done?'<br>Legacy Xerox credit: '+money(xi):''}
-      </div>
-     </div>
-     <b>${money(b.qty*b.rate+xi)}</b>
-    </div>
+    <div class="batchtop"><div><b>${b.qty} IDs</b> · ${b.fit} IDs per paper sheet<div class="batchmeta">${b.paper} paper sheets · ${b.qty} lamination sheets<br>ID printing income: ${money(b.qty*b.rate)}${done?'<br>Legacy Xerox credit: '+money(xi):''}</div></div><b>${money(b.qty*b.rate+xi)}</b></div>
    </div>`;
   }).join(''):'No batches recorded yet.';
 
-  $('xeroxHistory').innerHTML=state.xeroxJobs.length?'<h3 style="font-size:14px;margin:12px 0 6px">Completed Xerox entries</h3>'+state.xeroxJobs.map((j,i)=>`<div class="batch">
-   <div class="batchtop">
-    <div>
-     <b>${j.paper} paper sheet${j.paper===1?'':'s'}</b>
-     <div class="batchmeta">Completed Xerox · ${money(j.income)} income</div>
-    </div>
-    <button class="secondary" style="min-height:40px" data-undo-xerox="${i}">UNDO</button>
-   </div>
-  </div>`).join(''):'<div class="muted" style="font-size:13px;margin-top:10px">No separate Xerox jobs completed yet.</div>';
+  $('xeroxHistory').innerHTML=state.xeroxJobs.length?'<h3 style="font-size:14px;margin:12px 0 6px">Completed Xerox entries</h3>'+state.xeroxJobs.map((j,i)=>`<div class="batch"><div class="batchtop"><div><b>${j.paper} paper sheet${j.paper===1?'':'s'}</b><div class="batchmeta">Completed Xerox · ${money(j.income)} income</div></div><button class="secondary" style="min-height:40px" data-undo-xerox="${i}">UNDO</button></div></div>`).join(''):'<div class="muted" style="font-size:13px;margin-top:10px">No separate Xerox jobs completed yet.</div>';
 
   const xq=Number($('xeroxPaperQty').value);
   $('xeroxPreview').textContent=Number.isInteger(xq)&&xq>0?money(xq*5):'—';
-
   $('finishXerox').disabled=!(Number.isInteger(xq)&&xq>0&&t.paper+state.xeroxJobs.reduce((s,j)=>s+j.paper,0)+xq<=state.cfg.paperStock);
  }
 
- function fillSettings(){
-  ['lamStock','paperStock','rate','lamCost'].forEach(k=>{
-   const el=$(k);
-   if(el)el.value=state.cfg[k]??defaults.cfg[k];
-  });
- }
+ function fillSettings(){['lamStock','paperStock','rate','lamCost'].forEach(k=>{const el=$(k);if(el)el.value=state.cfg[k]??defaults.cfg[k];});}
 
  document.querySelectorAll('.numpad').forEach(pad=>pad.addEventListener('click',e=>{
-  const btn=e.target.closest('button');
-  if(!btn)return;
-
-  const target=$(pad.dataset.target);
-  let value=target.value||'';
-
+  const btn=e.target.closest('button');if(!btn)return;
+  const target=$(pad.dataset.target);let value=target.value||'';
   if(btn.dataset.action==='clear')value='';
   else if(btn.dataset.action==='back')value=value.slice(0,-1);
   else if(btn.dataset.digit!==undefined)value=(value==='0'?'':value)+btn.dataset.digit;
-
-  target.value=value;
-  render();
+  target.value=value;render();
  }));
 
  $('fitButtons').addEventListener('click',e=>{
-  const btn=e.target.closest('[data-fit]');
-  if(!btn)return;
-
-  $('fit').value=btn.dataset.fit;
-  $('fitDisplay').value=btn.dataset.fit;
-
+  const btn=e.target.closest('[data-fit]');if(!btn)return;
+  $('fit').value=btn.dataset.fit;$('fitDisplay').value=btn.dataset.fit;
   $('fitButtons').querySelectorAll('button').forEach(b=>b.classList.toggle('selected',b===btn));
-
   render();
  });
 
  $('add').addEventListener('click',()=>{
   const q=val('qty'),fit=val('fit'),paper=1,t=totals();
-
   if(!Number.isInteger(q)||q<1||!Number.isInteger(fit)||fit<1||fit>6||t.lam+q>state.cfg.lamStock||t.paper+paper>state.cfg.paperStock)return;
-
-  state.batches.push({
-   qty:q,
-   fit,
-   paper,
-   rate:state.cfg.rate,
-   xeroxCompleted:false,
-   xeroxRate:5,
-   xeroxCost:state.cfg.xeroxCost
-  });
-
-  save();
-  $('qty').value=6;
-  $('status').textContent='Batch recorded. One paper sheet and the required lamination sheets were deducted.';
-  render();
+  state.batches.push({qty:q,fit,paper,rate:state.cfg.rate,xeroxCompleted:false,xeroxRate:5,xeroxCost:state.cfg.xeroxCost});
+  save();$('qty').value=6;$('status').textContent='Batch recorded. One paper sheet and the required lamination sheets were deducted.';render();
  });
 
  $('xeroxHistory').addEventListener('click',e=>{
-  const button=e.target.closest('[data-undo-xerox]');
-  if(!button)return;
-
-  const i=Number(button.dataset.undoXerox);
-  if(!Number.isInteger(i)||!state.xeroxJobs[i])return;
-
-  state.xeroxJobs.splice(i,1);
-  save();
-
+  const button=e.target.closest('[data-undo-xerox]');if(!button)return;
+  const i=Number(button.dataset.undoXerox);if(!Number.isInteger(i)||!state.xeroxJobs[i])return;
+  state.xeroxJobs.splice(i,1);save();
   $('status').textContent='Xerox entry undone. Its income, paper usage, and related expenses were reversed.';
   render();
  });
@@ -490,69 +291,36 @@ details .row{margin-top:12px}
  $('xeroxPaperQty').addEventListener('input',render);
 
  $('finishXerox').addEventListener('click',()=>{
-  const paper=Number($('xeroxPaperQty').value);
-  const used=state.xeroxJobs.reduce((s,j)=>s+j.paper,0);
-  const t=totals();
-
-  if(!Number.isInteger(paper)||paper<1||t.paper+used+paper>state.cfg.paperStock){
-   $('status').textContent='Enter a valid paper quantity within your remaining paper stock.';
-   return;
-  }
-
+  const paper=Number($('xeroxPaperQty').value),used=state.xeroxJobs.reduce((s,j)=>s+j.paper,0),t=totals();
+  if(!Number.isInteger(paper)||paper<1||t.paper+used+paper>state.cfg.paperStock){$('status').textContent='Enter a valid paper quantity within your remaining paper stock.';return;}
   state.xeroxJobs.push({paper,income:paper*5,createdAt:Date.now()});
-  save();
-
-  $('xeroxPaperQty').value='';
+  save();$('xeroxPaperQty').value='';
   $('status').textContent=`Xerox completed: ${paper} paper sheet${paper===1?'':'s'} × ₱5 = ${money(paper*5)} added. Paper stock deducted.`;
   render();
  });
 
  $('saveSettings').addEventListener('click',()=>{
   const next={...state.cfg};
-
   for(const k of ['lamStock','paperStock','rate','lamCost']){
    const x=val(k);
-
-   if($(k).value.trim()===''||!Number.isFinite(x)||x<0){
-    $('status').textContent='Please enter valid non-negative numbers.';
-    return;
-   }
-
+   if($(k).value.trim()===''||!Number.isFinite(x)||x<0){$('status').textContent='Please enter valid non-negative numbers.';return;}
    next[k]=x;
   }
-
   const t=totals();
-
-  if(next.lamStock<t.lam||next.paperStock<t.paper){
-   $('status').textContent='Starting stock cannot be less than supplies already used.';
-   return;
-  }
-
-  state.cfg=next;
-  save();
-
+  if(next.lamStock<t.lam||next.paperStock<t.paper){$('status').textContent='Starting stock cannot be less than supplies already used.';return;}
+  state.cfg=next;save();
   const stored=JSON.parse(localStorage.getItem(KEY)||'null');
-
   $('status').textContent=stored&&stored.cfg&&stored.cfg.lamStock===next.lamStock&&stored.cfg.paperStock===next.paperStock?'Settings saved on this device.':'Could not verify saved settings. Check browser storage permissions.';
-
   render();
  });
 
  $('undo').addEventListener('click',()=>{
-  if(state.batches.length){
-   state.batches.pop();
-   save();
-   $('status').textContent='Last batch undone.';
-   render();
-  }
+  if(state.batches.length){state.batches.pop();save();$('status').textContent='Last batch undone.';render();}
  });
 
  $('reset').addEventListener('click',()=>{
   if(confirm('Clear all batches and start the count again? Stock and price settings will remain.')){
-   state.batches=[];
-   save();
-   $('status').textContent='Batch records cleared.';
-   render();
+   state.batches=[];save();$('status').textContent='Batch records cleared.';render();
   }
  });
 
