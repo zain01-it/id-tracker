@@ -1,4 +1,5 @@
 <!doctype html>
+
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -12,7 +13,7 @@ body{margin:0;padding:18px;max-width:760px;margin-inline:auto}
 header{margin:8px 0 18px}
 h1{font-size:24px;margin:0 0 4px}
 .sub,.muted{color:#667085;font-size:13px}
-.dashboard-toggle{width:100%;min-height:48px;margin-bottom:12px;background:#155eef;color:white;font-weight:750;font-size:15px}
+.dashboard-toggle{width:100%;min-height:48px;margin-bottom:12px;background:white;color:#155eef;border:1px solid #155eef;font-weight:750;font-size:15px}
 #dashboardCards[hidden]{display:none}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .card{background:white;border:1px solid #e4e7ec;border-radius:15px;padding:15px;margin-bottom:12px;min-width:0}
@@ -44,28 +45,49 @@ details .row{margin-top:12px}
 .service-buttons button{background:#f2f4f7;border:1px solid #d0d5dd;color:#344054}
 .service-buttons button.selected{background:#155eef;color:white;border-color:#155eef}
 .status{font-size:13px;color:#475467;min-height:20px;margin:10px 2px}
-.report-button{background:#067647;color:white}
+.report-button{background:#067647;color:white}/* Success and failure popup */
+.toast{
+position:fixed;
+top:16px;
+left:50%;
+transform:translate(-50%,-20px);
+width:calc(100% - 32px);
+max-width:440px;
+padding:15px 18px;
+border-radius:12px;
+color:white;
+font-size:14px;
+font-weight:700;
+text-align:center;
+box-shadow:0 5px 20px rgba(16,24,40,.2);
+z-index:9999;
+opacity:0;
+visibility:hidden;
+transition:opacity .25s ease,transform .25s ease,visibility .25s;
+pointer-events:none;
+}
+.toast.show{
+opacity:1;
+visibility:visible;
+transform:translate(-50%,0);
+}
+.toast.success{background:#067647}
+.toast.error{background:#d92d20}
+
 @media(max-width:390px){
- body{padding:12px}
- .value{font-size:22px}
- .card{padding:13px}
- .service-buttons button{padding:9px 6px;font-size:12px}
+body{padding:12px}
+.value{font-size:22px}
+.card{padding:13px}
+.service-buttons button{padding:9px 6px;font-size:12px}
 }
 </style>
-</head>
 
-<body>
-
-<header>
+</head><body><div id="toast" class="toast" role="status" aria-live="polite"></div><header>
  <h1>ID Printing Tracker</h1>
  <div class="sub">Printing · Lamination · Xerox · Sales · Profit</div>
-</header>
-
-<button type="button" class="dashboard-toggle" id="toggleDashboard" aria-expanded="false" aria-controls="dashboardCards">
+</header><button type="button" class="dashboard-toggle" id="toggleDashboard" aria-expanded="false" aria-controls="dashboardCards">
  SHOW DASHBOARD ▼
-</button>
-
-<div id="dashboardCards" hidden>
+</button><div id="dashboardCards" hidden>
  <div class="grid">
   <section class="card"><div class="label">REMAINING PAPER STOCK</div><div class="value" id="paperLeft">100</div><div class="muted" id="paperUsed">0 used</div></section>
   <section class="card"><div class="label">REMAINING LAMINATION STOCK</div><div class="value" id="lamLeft">100</div><div class="muted" id="lamUsed">0 used</div></section>
@@ -75,26 +97,17 @@ details .row{margin-top:12px}
   <section class="card"><div class="label">XEROX INCOME</div><div class="value" id="xeroxIncome">₱0.00</div></section>
   <section class="card"><div class="label">TOTAL INCOME</div><div class="value" id="gross">₱0.00</div></section>
   <section class="card"><div class="label">LAMINATION EXPENSES</div><div class="value" id="expense">₱0.00</div></section>
- </div>
-
- <section class="card-full">
+ </div> <section class="card-full">
   <div class="label">NET PROFIT</div>
   <div class="value green" id="profit">₱0.00</div>
  </section>
-</div>
+</div><section class="card">
+ <h2>Record completed IDs</h2><label>Choose service</label>
 
-<section class="card">
- <h2>Record completed IDs</h2>
-
- <label>Choose service</label>
  <div class="service-buttons" id="serviceButtons">
   <button type="button" data-service="laminated" class="selected">WITH LAMINATION<br>₱40 / ID</button>
   <button type="button" data-service="printOnly">PRINT ONLY<br>FREE</button>
- </div>
-
- <p class="notice" id="serviceNotice">With lamination: ₱40 per ID. Uses lamination sheets and 1 paper sheet per batch.</p>
-
- <div style="margin-top:14px">
+ </div> <p class="notice" id="serviceNotice">With lamination: ₱40 per ID. Uses lamination sheets and 1 paper sheet per batch.</p> <div style="margin-top:14px">
   <label>Number of IDs</label>
   <input id="qty" type="text" inputmode="none" value="6" readonly>
   <div class="numpad" data-target="qty">
@@ -103,9 +116,7 @@ details .row{margin-top:12px}
    <button type="button" data-digit="7">7</button><button type="button" data-digit="8">8</button><button type="button" data-digit="9">9</button>
    <button type="button" data-action="clear">Clear</button><button type="button" data-digit="0">0</button><button type="button" data-action="back">⌫</button>
   </div>
- </div>
-
- <div style="margin-top:16px">
+ </div> <div style="margin-top:16px">
   <label>IDs per paper sheet (informational)</label>
   <input id="fitDisplay" type="text" value="6" readonly>
   <div class="fit-buttons" id="fitButtons" style="margin-top:8px">
@@ -113,17 +124,11 @@ details .row{margin-top:12px}
    <button type="button" data-fit="4">4</button><button type="button" data-fit="5">5</button><button type="button" data-fit="6" class="selected">6</button>
   </div>
   <input id="fit" type="hidden" value="6">
- </div>
-
- <p class="notice" id="preview"></p>
+ </div> <p class="notice" id="preview"></p>
  <button class="primary" id="add" style="margin-top:12px">ADD BATCH</button>
-</section>
-
-<section class="card">
+</section><section class="card">
  <h2>Separate Xerox completion</h2>
- <p class="notice" style="margin-top:-4px">Record Xerox paper usage independently from ID-printing batches.</p>
-
- <div style="margin-top:12px">
+ <p class="notice" style="margin-top:-4px">Record Xerox paper usage independently from ID-printing batches.</p> <div style="margin-top:12px">
   <label>Number of paper sheets for Xerox</label>
   <input id="xeroxPaperQty" type="text" inputmode="none" value="" readonly>
   <div class="numpad" data-target="xeroxPaperQty">
@@ -132,33 +137,24 @@ details .row{margin-top:12px}
    <button type="button" data-digit="7">7</button><button type="button" data-digit="8">8</button><button type="button" data-digit="9">9</button>
    <button type="button" data-action="clear">Clear</button><button type="button" data-digit="0">0</button><button type="button" data-action="back">⌫</button>
   </div>
- </div>
-
- <div style="margin-top:14px">
+ </div> <div style="margin-top:14px">
   <label>Xerox income</label>
   <div class="value" id="xeroxPreview">—</div>
   <div class="muted">₱5 per paper sheet</div>
- </div>
+ </div><button class="primary" id="finishXerox" style="margin-top:12px">FINISH XEROX / DONE</button>
 
- <button class="primary" id="finishXerox" style="margin-top:12px">FINISH XEROX / DONE</button>
  <p class="notice">Paper stock is deducted when the job is completed.</p>
  <div id="xeroxHistory" style="margin-top:10px"></div>
-</section>
-
-<section class="card">
+</section><section class="card">
  <h2>Recent batches</h2>
  <div id="history" class="muted">No batches recorded yet.</div>
-</section>
-
-<section class="card">
+</section><section class="card">
  <h2>Remaining supplies</h2>
  <div class="grid">
   <div><div class="label">Lamination sheets</div><div class="stocknum" id="lamLeftSmall">100</div><div class="muted" id="lamUsedSmall">0 used</div></div>
   <div><div class="label">Paper sheets</div><div class="stocknum" id="paperLeftSmall">100</div><div class="muted" id="paperUsedSmall">0 used</div></div>
  </div>
-</section>
-
-<section class="card">
+</section><section class="card">
  <details>
   <summary>⚙ Stock & price settings</summary>
   <div class="row">
@@ -170,20 +166,27 @@ details .row{margin-top:12px}
   <button class="secondary" id="saveSettings" style="margin-top:12px">SAVE SETTINGS</button>
   <p class="notice">Print-only IDs are always free. Paper is quantity-only inventory and does not create a peso expense. Xerox earns ₱5 per paper sheet.</p>
  </details>
-</section>
-
-<div class="actions">
+</section><div class="actions">
  <button class="secondary" id="undo">↶ Undo last batch</button>
  <button class="report-button" id="saveReport">SAVE REPORT (PDF)</button>
  <button class="secondary" id="reset">Reset records</button>
-</div>
-
-<div class="status" id="status" aria-live="polite">Your records are saved on this device/browser.</div>
-
-<script>
+</div><div class="status" id="status" aria-live="polite">Your records are saved on this device/browser.</div><script>
 (()=>{
  const $=id=>document.getElementById(id);
  const KEY='simple-id-tracker-v1';
+
+ let toastTimer;
+
+ function notify(message,type='success'){
+  const toast=$('toast');
+  toast.textContent=message;
+  toast.className='toast '+type+' show';
+
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>{
+   toast.classList.remove('show');
+  },3000);
+ }
 
  const dashboardCards=$('dashboardCards');
  $('toggleDashboard').addEventListener('click',()=>{
@@ -263,7 +266,6 @@ details .row{margin-top:12px}
    .reduce((s,b)=>s+b.qty,0);
 
   const lam=laminatedIDs;
-
   const paper=state.batches.reduce((s,b)=>s+b.paper,0);
 
   const idIncome=state.batches.reduce(
@@ -271,7 +273,6 @@ details .row{margin-top:12px}
   );
 
   const legacyCompleted=state.batches.filter(b=>b.xeroxCompleted);
-
   const xeroxJobs=legacyCompleted.length+state.xeroxJobs.length;
 
   const xeroxIncome=
@@ -279,7 +280,6 @@ details .row{margin-top:12px}
    state.xeroxJobs.reduce((s,j)=>s+j.income,0);
 
   const xeroxPaper=state.xeroxJobs.reduce((s,j)=>s+j.paper,0);
-
   const expense=lam*state.cfg.lamCost;
   const gross=idIncome+xeroxIncome;
 
@@ -446,22 +446,31 @@ details .row{margin-top:12px}
   const fit=val('fit');
   const t=totals();
 
-  if(!Number.isInteger(q)||q<1)return;
+  if(!Number.isInteger(q)||q<1){
+   notify('Failed: Please enter a valid number of IDs.','error');
+   return;
+  }
 
   const laminated=selectedService==='laminated';
   const lamRequired=laminated?q:0;
   const income=laminated?q*state.cfg.rate:0;
 
-  if(
-   !Number.isInteger(fit)||fit<1||fit>6||
-   t.lam+lamRequired>state.cfg.lamStock||
-   t.paper+1>state.cfg.paperStock
-  ){
-   $('status').textContent='Not enough remaining stock for this batch.';
+  if(!Number.isInteger(fit)||fit<1||fit>6){
+   notify('Failed: Please select a valid IDs-per-sheet option.','error');
    return;
   }
 
-  state.batches.push({
+  if(t.lam+lamRequired>state.cfg.lamStock){
+   notify('Failed: Not enough lamination stock.','error');
+   return;
+  }
+
+  if(t.paper+1>state.cfg.paperStock){
+   notify('Failed: Not enough paper stock.','error');
+   return;
+  }
+
+  const batch={
    qty:q,
    fit,
    paper:1,
@@ -470,17 +479,25 @@ details .row{margin-top:12px}
    xeroxCompleted:false,
    xeroxRate:5,
    createdAt:Date.now()
-  });
+  };
 
-  save();
+  state.batches.push(batch);
+
+  if(!save()){
+   state.batches.pop();
+   notify('Failed: Could not save this batch. Check your browser storage.','error');
+   render();
+   return;
+  }
 
   $('qty').value=6;
 
-  $('status').textContent=laminated
-   ?'Laminated ID batch recorded. Lamination and paper stock deducted.'
-   :'Free print-only batch recorded. Only paper stock deducted.';
-
   render();
+
+  notify(
+   `✓ Success! ${q} ${q===1?'ID':'IDs'} added — ${laminated?'With lamination':'Print only (FREE)'}.`,
+   'success'
+  );
  });
 
  $('xeroxHistory').addEventListener('click',e=>{
@@ -504,11 +521,13 @@ details .row{margin-top:12px}
   const used=state.xeroxJobs.reduce((s,j)=>s+j.paper,0);
   const t=totals();
 
-  if(
-   !Number.isInteger(paper)||paper<1||
-   t.paper+used+paper>state.cfg.paperStock
-  ){
-   $('status').textContent='Enter a valid paper quantity within your remaining paper stock.';
+  if(!Number.isInteger(paper)||paper<1){
+   notify('Failed: Enter a valid Xerox paper quantity.','error');
+   return;
+  }
+
+  if(t.paper+used+paper>state.cfg.paperStock){
+   notify('Failed: Not enough remaining paper stock for Xerox.','error');
    return;
   }
 
@@ -518,11 +537,17 @@ details .row{margin-top:12px}
    createdAt:Date.now()
   });
 
-  save();
-  $('xeroxPaperQty').value='';
+  if(!save()){
+   state.xeroxJobs.pop();
+   notify('Failed: Could not save the Xerox entry.','error');
+   render();
+   return;
+  }
 
-  $('status').textContent=`Xerox completed: ${paper} sheet(s) × ₱5 = ${money(paper*5)} added.`;
+  $('xeroxPaperQty').value='';
   render();
+
+  notify(`✓ Xerox completed! ${paper} sheet(s) · ${money(paper*5)} income.`,'success');
  });
 
  $('saveSettings').addEventListener('click',()=>{
@@ -532,7 +557,7 @@ details .row{margin-top:12px}
    const x=val(k);
 
    if($(k).value.trim()===''||!Number.isFinite(x)||x<0){
-    $('status').textContent='Please enter valid non-negative numbers.';
+    notify('Failed: Please enter valid non-negative numbers.','error');
     return;
    }
 
@@ -543,29 +568,41 @@ details .row{margin-top:12px}
   const xeroxPaper=state.xeroxJobs.reduce((s,j)=>s+j.paper,0);
 
   if(next.lamStock<t.lam||next.paperStock<t.paper+xeroxPaper){
-   $('status').textContent='Starting stock cannot be less than supplies already used.';
+   notify('Failed: Starting stock cannot be less than supplies already used.','error');
    return;
   }
 
+  const previous=state.cfg;
   state.cfg=next;
-  save();
+
+  if(!save()){
+   state.cfg=previous;
+   fillSettings();
+   return;
+  }
 
   $('serviceNotice').textContent=selectedService==='laminated'
    ?'With lamination: ₱'+state.cfg.rate+' per ID. Uses lamination sheets and 1 paper sheet per batch.'
    :'Print only: FREE. No lamination sheets are deducted. Only 1 paper sheet is deducted per batch.';
 
-  $('status').textContent='Settings saved on this device.';
   render();
+  notify('✓ Settings saved successfully!','success');
  });
 
  $('undo').addEventListener('click',()=>{
   if(!state.batches.length)return;
 
-  state.batches.pop();
-  save();
+  const removed=state.batches.pop();
 
-  $('status').textContent='Last ID batch undone.';
+  if(!save()){
+   state.batches.push(removed);
+   notify('Failed: Could not undo the last batch.','error');
+   render();
+   return;
+  }
+
   render();
+  notify('Last ID batch successfully undone.','success');
  });
 
  function escapeHTML(value){
@@ -617,7 +654,7 @@ details .row{margin-top:12px}
   const win=window.open('','_blank');
 
   if(!win){
-   $('status').textContent='Report window blocked. Allow pop-ups for this site and try again.';
+   notify('Report blocked. Please allow pop-ups for this site.','error');
    return;
   }
 
@@ -649,13 +686,10 @@ details .row{margin-top:12px}
      table{page-break-inside:auto}
      tr{page-break-inside:avoid;page-break-after:auto}
     }
-   </style>
-  </head>
+   </style>  </head>
   <body>
    <h1>ID Printing & Lamination Tracker</h1>
-   <div class="muted">Business report · Generated ${escapeHTML(new Date().toLocaleString('en-PH'))}</div>
-
-   <h2>Financial Summary</h2>
+   <div class="muted">Business report · Generated ${escapeHTML(new Date().toLocaleString('en-PH'))}</div>   <h2>Financial Summary</h2>
    <div class="summary">
     <div class="box"><div class="label">TOTAL IDs PRINTED</div><div class="value">${t.ids}</div></div>
     <div class="box"><div class="label">LAMINATED IDs</div><div class="value">${t.laminatedIDs}</div></div>
@@ -666,40 +700,30 @@ details .row{margin-top:12px}
     <div class="box"><div class="label">TOTAL INCOME</div><div class="value">${money(t.gross)}</div></div>
     <div class="box"><div class="label">LAMINATION EXPENSES</div><div class="value">${money(t.expense)}</div></div>
     <div class="box"><div class="label">NET PROFIT</div><div class="value profit">${money(t.profit)}</div></div>
-   </div>
-
-   <h2>Supply Summary</h2>
+   </div>   <h2>Supply Summary</h2>
    <table>
     <thead><tr><th>Supply</th><th>Starting Stock</th><th>Used</th><th>Remaining</th></tr></thead>
     <tbody>
      <tr><td>Paper sheets</td><td>${state.cfg.paperStock}</td><td>${totalPaper}</td><td>${Math.max(0,state.cfg.paperStock-totalPaper)}</td></tr>
      <tr><td>Lamination sheets</td><td>${state.cfg.lamStock}</td><td>${t.lam}</td><td>${Math.max(0,state.cfg.lamStock-t.lam)}</td></tr>
     </tbody>
-   </table>
-
-   <h2>ID Printing Batches</h2>
+   </table>   <h2>ID Printing Batches</h2>
    <table>
     <thead>
      <tr><th>#</th><th>Date</th><th>IDs</th><th>Service</th><th>Lamination</th><th>Paper</th><th>Income</th></tr>
     </thead>
     <tbody>${batchRows||'<tr><td colspan="7">No ID batches recorded.</td></tr>'}</tbody>
-   </table>
-
-   <h2>Separate Xerox Entries</h2>
+   </table>   <h2>Separate Xerox Entries</h2>
    <table>
     <thead><tr><th>#</th><th>Date</th><th>Paper sheets</th><th>Income</th></tr></thead>
     <tbody>${xeroxRows||'<tr><td colspan="4">No separate Xerox entries recorded.</td></tr>'}</tbody>
-   </table>
-
-   ${legacyRows.length?'<p class="note">This report also includes legacy Xerox credits from older ID batches in the total Xerox income.</p>':''}
+   </table>${legacyRows.length?'<p class="note">This report also includes legacy Xerox credits from older ID batches in the total Xerox income.</p>':''}
 
    <div class="note">
     Print-only IDs are free and do not consume lamination sheets.
     Each ID batch consumes one paper sheet. Paper is tracked by quantity only.
     Net profit = total income minus lamination expenses.
-   </div>
-
-   <script>
+   </div>   <script>
     window.onload=function(){
      setTimeout(function(){window.print()},500);
     };
@@ -709,26 +733,34 @@ details .row{margin-top:12px}
 
   win.document.close();
 
-  $('status').textContent='Report opened. Choose Save as PDF in the print options.';
+  notify('Report opened. Choose Save as PDF in the print options.','success');
  }
 
  $('saveReport').addEventListener('click',saveReport);
 
  $('reset').addEventListener('click',()=>{
   if(confirm('Clear ALL ID batches and Xerox records? Your stock and price settings will remain. Save your PDF report first if you need a copy.')){
+   const oldBatches=state.batches;
+   const oldXerox=state.xeroxJobs;
+
    state.batches=[];
    state.xeroxJobs=[];
-   save();
 
-   $('status').textContent='All ID and Xerox records cleared. Your settings were kept.';
+   if(!save()){
+    state.batches=oldBatches;
+    state.xeroxJobs=oldXerox;
+    notify('Failed: Could not reset records.','error');
+    render();
+    return;
+   }
+
    render();
+   notify('All ID and Xerox records cleared. Settings were kept.','success');
   }
  });
 
  fillSettings();
  render();
 })();
-</script>
-
-</body>
+</script></body>
 </html>
